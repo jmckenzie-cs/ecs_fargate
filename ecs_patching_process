@@ -1,67 +1,56 @@
 ECS Fargate Task Patching
 
-Documenation and Pipeline Example
+Documentation and Pipeline Example:
 
-https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
-https://github.com/TomRyan-321/crowdstrike-ecs-fargate-pipepline-demo
+- https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
+- https://github.com/TomRyan-321/crowdstrike-ecs-fargate-pipeline-demo
 
-
-
-#Step 0 Downlaod CrowdStrike Script
+# Download the script for pulling the Falcon container sensor.
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
 chmod +x falcon-container-sensor-pull.sh
 
-#Step 1: Create an API client key Find the Falcon Images Download API scope and select Read. Sensor Download API scope - Read.
+# Generate an API key in the Falcon UI with "Read" scope for both Images Download API and Sensor Download API.
 export FALCON_CLIENT_ID=16a0752725c94037bba17e846403e01f
 export FALCON_CLIENT_SECRET=k52Y7AhuoUQjJC3m1TSZ0Ke4XXXXX
 
-#Step 2: Get your CrowdStrike CID with checksum
-export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid )
+# Use the downloaded script to get your CrowdStrike CID.
+export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
 
-#Step 3:Set Private repo 
+# Specify the private ECR repository where the Falcon container sensor will be stored.
 export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
 
-#Step 4: Retrieve the sensor image and Tag
+# Get the latest sensor image version and tag it for pushing to the private ECR.
 export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
 docker tag "$LATESTSENSOR" "$PRIVATE_REPO":falcon-container-sensor-latest
 
-#Login in with AWS CLI
-    example: saml2aws login
-
-#STEP 5: Log into ECR
+# Log in to the private ECR repository using AWS CLI.
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$PRIVATE_REPO"
 
-#STEP 6: Push Falcon Container Sensor to ECR
+# Push the tagged Falcon container sensor image to your ECR repository.
 export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
 
-
-#STEP 7: Set name of Task defination to be patch
+# Define the name of the ECS task to be patched.
 export TASK_NAME=Webserver
 
-#STEP 8: Get Pull token for for ECR registry. The Pull Token will be passed to the  patching utility (container Sensor)
-
-#MAC EXAMPLE arm64
-IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"$PRIVATE_REPO""\":{\"auth\":\"$(echo AWS:$(aws ecr get-login-password --region us-east-1)|base64 )\"}}}" | base64 )
-#LINUX EXAMPLE
+# Generate a token for accessing the private ECR registry. This will be used by the patching utility.
+# MAC Example (arm64 architecture)
+IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"$PRIVATE_REPO""\":{\"auth\":\"$(echo AWS:$(aws ecr get-login-password --region us-east-1)|base64 )\"}}}" | base64)
+# Linux Example (x86 architecture)
 IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"$PRIVATE_REPO""\":{\"auth\":\"$(echo AWS:$(aws ecr get-login-password --region us-east-1)|base64 -w 0 )\"}}}" | base64 -w 0)
 
-#The Task Definition to be Patched need to be stored locally. I have the task definition stored in a folder called “devops/ECS”.  Note how I pipe the “patch” version of the task Definition to the directory the unpatched version is stored. 
-
-#MAC w/ M1 chip (I used this one)
-#Example: 
+# The task definition should be stored locally before patching. Here, the patched version is saved alongside the unpatched one.
+# MAC w/ M1 chip (example)
 docker run --platform linux/amd64 -v ~/devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
 -cid $FALCON_CID -image $FALCON_IMAGE_URI \
 -ecs-spec-file /var/run/spec/"$TASK_NAME".json \
 -pulltoken "$IMAGE_PULL_TOKEN" >~/devops/ECS/"$TASK_NAME"_patched.json
 
-#Linux/MAC w/ intel chip
-#Example:
- docker run --platform linux -v ~/ devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
+# Linux/MAC w/ Intel chip (example)
+docker run --platform linux -v ~/devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
 -cid $FALCON_CID -image $FALCON_IMAGE_URI \
 -ecs-spec-file /var/run/spec/detection_container_TD_unpatched.json \
--pulltoken "$IMAGE_PULL_TOKEN"   >~/devops/ECS/"$TASK_NAME"_patched.json
+-pulltoken "$IMAGE_PULL_TOKEN" >~/devops/ECS/"$TASK_NAME"_patched.json
 
-
-#Push Patched Task Definition to ECS
+# Register the patched task definition with ECS using the AWS CLI.
 aws ecs register-task-definition --cli-input-json file://$HOME/devops/ECS/"$TASK_NAME"_patched.json 1>/dev/null
