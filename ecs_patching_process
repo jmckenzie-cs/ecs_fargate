@@ -3,7 +3,7 @@ ECS Fargate Task Patching
 Documentation and Pipeline Example:
 
 - https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
-- https://github.com/TomRyan-321/crowdstrike-ecs-fargate-pipeline-demo
+- https://github.com/TomRyan-321/crowdstrike-ecs-fargate-pipepline-demo/actions/runs/10868500078/workflow
 
 # Download the script for pulling the Falcon container sensor.
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
