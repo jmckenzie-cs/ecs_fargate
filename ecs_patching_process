@@ -43,7 +43,7 @@ IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"$PRIVATE_REPO""\":{\"auth\":\"$(echo AWS:
 #The task definition spec file directory: "~/devops/ECS" is the location of the unpatched task definition
 #The task definition is binded to this mount point inside of the patching utility/container image: "/var/run/spec" DO NOT CHANGE
 #The "-ecs-spec-file" specifies a ECS unpatched task definition file or a CloudFormation template (JSON or YAML). ONLY UPDATE $TASKNAME
-#-pulltoken is required when pulling from registries that require authentication. This token is passed to the patchting uiltity as it needs to access the container image referrence in the task definition.
+#-pulltoken is required when pulling from registries that require authentication. This token is passed to the patching uiltity as it needs to access the container image referrence in the task definition.
 
 
 # The task definition should be stored locally before patching. Here, the patched version is saved alongside the unpatched one.
