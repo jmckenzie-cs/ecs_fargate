@@ -1,0 +1,78 @@
+ECS Container patching
+
+# Download the script for pulling the Falcon container sensor.
+curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
+chmod +x falcon-container-sensor-pull.sh
+
+# Generate an API key in the Falcon UI with "Read" scope for both Images Download API and Sensor Download API.
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d40bea8cbc7c
+export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQHfl8s7t0DXhjO4uKy3
+
+# Use the downloaded script to get your CrowdStrike CID.
+export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
+
+# Specify the private ECR repository where the Falcon container sensor will be stored.
+export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
+
+# Get the latest sensor image version and tag it for pushing to the private ECR.
+export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
+docker tag $LATESTSENSOR "$PRIVATE_REPO":falcon-container-sensor-latest
+
+# Log in to the private ECR repository using AWS CLI.
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$PRIVATE_REPO"
+
+# Push the tagged Falcon container sensor image to your ECR repository.
+export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
+docker push $FALCON_IMAGE_URI
+
+# Container image to be patched locatoin
+export SOURCE_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04
+
+# Container image after patching
+export TARGET_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04-patched
+
+
+# The Falcon utility, falconutil, is packaged within the Falcon Container sensor image. Run this utility locally to patch your application container image with the Falcon Container sensor for Linux. You can also run this as part of your CI/CD process.
+
+docker run --platform linux/amd64 --user 0:0 \
+  -v ${HOME}/.docker/config.json:/root/.docker/config.json \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --rm "$PRIVATE_REPO" \
+  falconutil patch-image ecsfargate \
+  --source-image-uri $SOURCE_IMAGE_URI \
+  --target-image-uri $TARGET_IMAGE_URI \
+  --falcon-image-uri $FALCON_IMAGE_URI \
+  --cid $FALCON_CID \
+  --image-pull-policy IfNotPresent
+
+
+
+# Just the commands
+
+curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
+chmod +x falcon-container-sensor-pull.sh
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d40bea8cbc7c
+export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQHfl8s7t0DXhjO4uKy3
+export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
+export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
+export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
+docker tag $LATESTSENSOR "$PRIVATE_REPO":falcon-container-sensor-latest
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$PRIVATE_REPO"
+export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
+docker push $FALCON_IMAGE_URI
+export SOURCE_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04
+export TARGET_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04-patched
+
+
+docker run --platform linux/amd64 --user 0:0 \
+  -v ${HOME}/.docker/config.json:/root/.docker/config.json \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --rm "$FALCON_IMAGE_URI" \
+  falconutil patch-image ecsfargate \
+  --source-image-uri $SOURCE_IMAGE_URI \
+  --target-image-uri $TARGET_IMAGE_URI \
+  --falcon-image-uri $FALCON_IMAGE_URI \
+  --cid $FALCON_CID \
+  --image-pull-policy IfNotPresent
+
+
