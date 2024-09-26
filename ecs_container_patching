@@ -5,8 +5,8 @@ curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/fal
 chmod +x falcon-container-sensor-pull.sh
 
 # Generate an API key in the Falcon UI with "Read" scope for both Images Download API and Sensor Download API.
-export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d40bea8cbc7c
-export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQHfl8s7t0DXhjO4uKy3
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4######
+export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQ#####################
 
 # Use the downloaded script to get your CrowdStrike CID.
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
