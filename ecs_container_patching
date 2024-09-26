@@ -51,8 +51,8 @@ docker run --platform linux/amd64 --user 0:0 \
 
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
 chmod +x falcon-container-sensor-pull.sh
-export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d40bea8cbc7c
-export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQHfl8s7t0DXhjO4uKy3
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4######
+export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQ#####################
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
 export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
 export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
