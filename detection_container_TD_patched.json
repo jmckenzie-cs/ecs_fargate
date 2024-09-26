@@ -1,0 +1,103 @@
+{
+   "containerDefinitions": [
+      {
+         "cpu": 0,
+         "dependsOn": [
+            {
+               "condition": "COMPLETE",
+               "containerName": "crowdstrike-falcon-init-container"
+            }
+         ],
+         "entryPoint": [
+            "/tmp/CrowdStrike/rootfs/lib64/ld-linux-x86-64.so.2",
+            "--library-path",
+            "/tmp/CrowdStrike/rootfs/lib64",
+            "/tmp/CrowdStrike/rootfs/bin/bash",
+            "/tmp/CrowdStrike/rootfs/entrypoint-ecs.sh",
+            "/entrypoint.sh"
+         ],
+         "environment": [
+            {
+               "name": "FALCONCTL_OPTS",
+               "value": "--cid=4344FD98B7B242519A94CD52E0345CD9-52"
+            }
+         ],
+         "environmentFiles": [],
+         "essential": true,
+         "image": "517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:detection-container_amd64",
+         "linuxParameters": {
+            "capabilities": {
+               "add": [
+                  "SYS_PTRACE"
+               ]
+            }
+         },
+         "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+               "awslogs-create-group": "true",
+               "awslogs-group": "/ecs/mckenzie_detection",
+               "awslogs-region": "us-east-1",
+               "awslogs-stream-prefix": "ecs"
+            },
+            "secretOptions": []
+         },
+         "mountPoints": [
+            {
+               "containerPath": "/tmp/CrowdStrike",
+               "readOnly": true,
+               "sourceVolume": "crowdstrike-falcon-volume"
+            }
+         ],
+         "name": "detection-container",
+         "portMappings": [
+            {
+               "appProtocol": "http",
+               "containerPort": 80,
+               "hostPort": 80,
+               "name": "detection-container-80-tcp",
+               "protocol": "tcp"
+            }
+         ],
+         "ulimits": [],
+         "volumesFrom": []
+      },
+      {
+         "entryPoint": [
+            "/bin/bash",
+            "-c",
+            "chmod u+rwx /tmp/CrowdStrike && mkdir /tmp/CrowdStrike/rootfs && cp -r /bin /etc /lib64 /usr /entrypoint-ecs.sh /tmp/CrowdStrike/rootfs && chmod -R a=rX /tmp/CrowdStrike"
+         ],
+         "essential": false,
+         "image": "517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:falcon-container-sensor-latest",
+         "mountPoints": [
+            {
+               "containerPath": "/tmp/CrowdStrike",
+               "readOnly": false,
+               "sourceVolume": "crowdstrike-falcon-volume"
+            }
+         ],
+         "name": "crowdstrike-falcon-init-container",
+         "readonlyRootFilesystem": true,
+         "user": "0:0"
+      }
+   ],
+   "cpu": "512",
+   "executionRoleArn": "arn:aws:iam::517716713836:role/ECSTaskExecutionRole",
+   "family": "detection_container_xs_guide",
+   "memory": "1024",
+   "networkMode": "awsvpc",
+   "requiresCompatibilities": [
+      "FARGATE"
+   ],
+   "runtimePlatform": {
+      "cpuArchitecture": "X86_64",
+      "operatingSystemFamily": "LINUX"
+   },
+   "taskRoleArn": "arn:aws:iam::517716713836:role/ECSTaskExecutionRole",
+   "volumes": [
+      {
+         "name": "crowdstrike-falcon-volume"
+      }
+   ]
+}
