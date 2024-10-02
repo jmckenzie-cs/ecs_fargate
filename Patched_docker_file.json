@@ -21,7 +21,7 @@
             "StdinOnce": false,
             "Env": [
                 "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                "FALCONCTL_OPTS=--cid=4344FD98B7B242519A94CD52E0345CD9-52",
+                "FALCONCTL_OPTS=--cid=##44FD98B7B242519A94CD52E0345CD9-##",
                 "__CS_FALCON_SENSOR_ROOT=/tmp/CrowdStrike/rootfs"
             ],
             "Cmd": [
