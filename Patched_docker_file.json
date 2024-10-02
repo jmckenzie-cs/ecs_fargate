@@ -1,0 +1,101 @@
+[
+    {
+        "Id": "sha256:15cbde29309e36972609d32cf61d330fa9f6b10af204d2e5c4f99341cd433124",
+        "RepoTags": [
+            "517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04-patched"
+        ],
+        "RepoDigests": [],
+        "Parent": "sha256:f8aca4afaeec838871a995bfb1907f14573f11e5b0c83e87fa0a7628649aa7b3",
+        "Comment": "",
+        "Created": "2024-09-25T20:59:21.181005218Z",
+        "Container": "638577449fc84ea188cf063d0e1ca648fe860aa5dc62d25b0f6ba8c55a0443de",
+        "ContainerConfig": {
+            "Hostname": "638577449fc8",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "FALCONCTL_OPTS=--cid=4344FD98B7B242519A94CD52E0345CD9-52",
+                "__CS_FALCON_SENSOR_ROOT=/tmp/CrowdStrike/rootfs"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "#(nop) ",
+                "CMD [\"/bin/bash\"]"
+            ],
+            "Image": "sha256:f8aca4afaeec838871a995bfb1907f14573f11e5b0c83e87fa0a7628649aa7b3",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/tmp/CrowdStrike/rootfs/bin/falcon-entrypoint"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "org.opencontainers.image.ref.name": "ubuntu",
+                "org.opencontainers.image.version": "22.04"
+            }
+        },
+        "DockerVersion": "23.0.6",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "FALCONCTL_OPTS=--cid=4344FD98B7B242519A94CD52E0345CD9-52",
+                "__CS_FALCON_SENSOR_ROOT=/tmp/CrowdStrike/rootfs"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "Image": "sha256:f8aca4afaeec838871a995bfb1907f14573f11e5b0c83e87fa0a7628649aa7b3",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/tmp/CrowdStrike/rootfs/bin/falcon-entrypoint"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "org.opencontainers.image.ref.name": "ubuntu",
+                "org.opencontainers.image.version": "22.04"
+            }
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 318347603,
+        "VirtualSize": 318347603,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/a7cb70bf8160ef456202c6f80d42130a97ac3624d490765565339e4bdf28d610/diff",
+                "MergedDir": "/var/lib/docker/overlay2/aae03c81f06dedf0b7b12ea1c89bb78e098b1d74f690a266bc20c4adbd107687/merged",
+                "UpperDir": "/var/lib/docker/overlay2/aae03c81f06dedf0b7b12ea1c89bb78e098b1d74f690a266bc20c4adbd107687/diff",
+                "WorkDir": "/var/lib/docker/overlay2/aae03c81f06dedf0b7b12ea1c89bb78e098b1d74f690a266bc20c4adbd107687/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:0b9c994b0484c0bc61f9de7c28a58745a504704254c5e8ed12349ebee3393a66",
+                "sha256:ec67388b2fdbfeccf7b42d314403aac38cfdf5454c5f66e7ad31856aac50cf28"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2024-09-25T20:59:21.189916927Z"
+        }
+    }
+]
