@@ -10,7 +10,7 @@ curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/fal
 chmod +x falcon-container-sensor-pull.sh
 
 # Generate an API key in the Falcon UI with "Read" scope for both Images Download API and Sensor Download API.
-export FALCON_CLIENT_ID=16a0752725c94037bba17e846403e01f
+export FALCON_CLIENT_ID=16a0752725c94037bbaXXXXXXXXXXX
 export FALCON_CLIENT_SECRET=k52Y7AhuoUQjJC3m1TSZ0Ke4XXXXX
 
 # Use the downloaded script to get your CrowdStrike CID.
@@ -66,7 +66,7 @@ aws ecs register-task-definition --cli-input-json file://$HOME/devops/ECS/"$TASK
 
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
 chmod +x falcon-container-sensor-pull.sh
-export FALCON_CLIENT_ID=16a0752725c94037bba17e846403e01f
+export FALCON_CLIENT_ID=16a0752725c94037bba17XXXXXXXX
 export FALCON_CLIENT_SECRET=k52Y7AhuoUQjJC3m1TSZ0Ke4XXXXX
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
 export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
