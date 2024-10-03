@@ -19,7 +19,7 @@
          "environment": [
             {
                "name": "FALCONCTL_OPTS",
-               "value": "--cid=4344FD98B7B242519A94CD52E0345CD9-52"
+               "value": "--cid=#############################-##"
             }
          ],
          "environmentFiles": [],
