@@ -1,12 +1,16 @@
 ECS Container patching
 
+Documentation and Pipeline Example:
+
+- https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
+
 # Download the script for pulling the Falcon container sensor.
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
 chmod +x falcon-container-sensor-pull.sh
 
 # Generate an API key in the Falcon UI with "Read" scope for both Images Download API and Sensor Download API.
-export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4######
-export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQ#####################
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d########
+export FALCON_CLIENT_SECRET=8HENWYdIOon912pKJRkZ6i4CXr5########
 
 # Use the downloaded script to get your CrowdStrike CID.
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
@@ -26,13 +30,13 @@ export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
 
 # Container image to be patched locatoin
-export SOURCE_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04
+export SOURCE_IMAGE_URI=quay.io/crowdstrike/vulnapp:latest
 
 # Container image after patching
-export TARGET_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04-patched
+export TARGET_IMAGE_URI="$PRIVATE_REPO"/vulnapp:latest-patched
+
 
 # The Falcon utility, falconutil, is packaged within the Falcon Container sensor image. Run this utility locally to patch your application container image with the Falcon Container sensor for Linux. You can also run this as part of your CI/CD process.
-# This docker run command is used to start a Docker container with specific configurations, particularly targeting a certain platform (linux/amd64), running as the root user (0:0), and binding volumes from the host to the container. Let me break down each part:
 
 # 1. docker run: This is the command used to create and start a container from a Docker image.
 # 2. --platform linux/amd64: This option specifies the platform on which to run the container. In this case, it forces the container to run on the linux/amd64 architecture. This is useful if you are running the command on a machine with a different architecture (such as arm64) and want to run an image built for amd64.
@@ -41,7 +45,6 @@ export TARGET_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-im
 # 5. ${HOME}/.docker/config.json refers to the Docker configuration file on the host system (this is a path in the user's home directory).
 # 6. /root/.docker/config.json is the location inside the container where the file will be mounted. This allows the container to use the same Docker credentials as the host, which is useful when pulling or pushing Docker images to a registry.
 # 7. -v /var/run/docker.sock:/var/run/docker.sock: This mounts the Docker socket from the host to the container. The Docker socket (/var/run/docker.sock) allows the container to communicate with the Docker daemon running on the host. This is typically used in scenarios where the container needs to manage Docker containers or images on the host system.
-
 
 docker run --platform linux/amd64 --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
@@ -55,13 +58,12 @@ docker run --platform linux/amd64 --user 0:0 \
   --image-pull-policy IfNotPresent
 
 
-
 # Just the commands
 
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
 chmod +x falcon-container-sensor-pull.sh
-export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4######
-export FALCON_CLIENT_SECRET=cY9kpBWMN2dRm51TUC6PvQ#####################
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d########
+export FALCON_CLIENT_SECRET=8HENWYdIOon912pKJRkZ6i4CXr5########
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
 export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
 export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
@@ -69,8 +71,8 @@ docker tag $LATESTSENSOR "$PRIVATE_REPO":falcon-container-sensor-latest
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$PRIVATE_REPO"
 export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
-export SOURCE_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04
-export TARGET_IMAGE_URI=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:ubuntu-22.04-patched
+export SOURCE_IMAGE_URI=quay.io/crowdstrike/vulnapp:latest
+export TARGET_IMAGE_URI="$PRIVATE_REPO"/vulnapp:latest-patched
 
 
 docker run --platform linux/amd64 --user 0:0 \
