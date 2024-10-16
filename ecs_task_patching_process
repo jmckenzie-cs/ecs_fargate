@@ -10,8 +10,8 @@ curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/fal
 chmod +x falcon-container-sensor-pull.sh
 
 # Generate an API key in the Falcon UI with "Read" scope for both Images Download API and Sensor Download API.
-export FALCON_CLIENT_ID=16a0752725c94037bbaXXXXXXXXXXX
-export FALCON_CLIENT_SECRET=k52Y7AhuoUQjJC3m1TSZ0Ke4XXXXX
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4#########
+export FALCON_CLIENT_SECRET=8HENWYdIOon912pKJRkZ6i4CX#############
 
 # Use the downloaded script to get your CrowdStrike CID.
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
@@ -31,7 +31,7 @@ export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
 
 # Define the name of the ECS task to be patched.
-export TASK_NAME=Webserver
+export TASK_NAME=vulnapp-revision1
 
 # Generate a token for accessing the private ECR registry. This will be used by the patching utility.
 # MAC Example (arm64 architecture)
@@ -66,8 +66,8 @@ docker run --platform linux -v /Users/jmckenzie/devops/ECS:/var/run/spec --rm $F
 
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
 chmod +x falcon-container-sensor-pull.sh
-export FALCON_CLIENT_ID=16a0752725c94037bba17XXXXXXXX
-export FALCON_CLIENT_SECRET=k52Y7AhuoUQjJC3m1TSZ0Ke4XXXXX
+export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4#########
+export FALCON_CLIENT_SECRET=8HENWYdIOon912pKJRkZ6i4CX#############
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
 export PRIVATE_REPO=517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
 export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
@@ -75,7 +75,7 @@ docker tag "$LATESTSENSOR" "$PRIVATE_REPO":falcon-container-sensor-latest
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$PRIVATE_REPO"
 export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
-export TASK_NAME=Webserver
+export TASK_NAME=vulnapp-revision1
 IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"$PRIVATE_REPO""\":{\"auth\":\"$(echo AWS:$(aws ecr get-login-password --region us-east-1)|base64 )\"}}}" | base64)
 
 
