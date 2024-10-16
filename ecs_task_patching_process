@@ -48,16 +48,16 @@ IMAGE_PULL_TOKEN=$(echo "{\"auths\":{\"$PRIVATE_REPO""\":{\"auth\":\"$(echo AWS:
 
 # The task definition should be stored locally before patching. Here, the patched version is saved alongside the unpatched one.
 # MAC w/ M1 chip (example)
-docker run --platform linux/amd64 -v ~/devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
+docker run --platform linux/amd64 -v /Users/jmckenzie/devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
 -cid $FALCON_CID -image $FALCON_IMAGE_URI \
 -ecs-spec-file /var/run/spec/"$TASK_NAME".json \
--pulltoken "$IMAGE_PULL_TOKEN" >~/devops/ECS/"$TASK_NAME"_patched.json
+-pulltoken "$IMAGE_PULL_TOKEN" >/Users/jmckenzie/devops/ECS/"$TASK_NAME"_patched.json
 
 # Linux/MAC w/ Intel chip (example)
-docker run --platform linux -v ~/devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
+docker run --platform linux -v /Users/jmckenzie/devops/ECS:/var/run/spec --rm $FALCON_IMAGE_URI \
 -cid $FALCON_CID -image $FALCON_IMAGE_URI \
 -ecs-spec-file /var/run/spec/detection_container_TD_unpatched.json \
--pulltoken "$IMAGE_PULL_TOKEN" >~/devops/ECS/"$TASK_NAME"_patched.json
+-pulltoken "$IMAGE_PULL_TOKEN" >/Users/jmckenzie/devops/ECS/"$TASK_NAME"_patched.json
 
 # Register the patched task definition with ECS using the AWS CLI.
  aws ecs register-task-definition --cli-input-json file:///Users/jmckenzie/devops/ECS/"$TASK_NAME"_patched.json 1>/dev/null
@@ -83,3 +83,5 @@ docker run --platform linux/amd64 -v /Users/jmckenzie/devops/ECS:/var/run/spec -
 -cid $FALCON_CID -image $FALCON_IMAGE_URI \
 -ecs-spec-file /var/run/spec/"$TASK_NAME".json \
 -pulltoken "$IMAGE_PULL_TOKEN" >/Users/jmckenzie/devops/ECS/"$TASK_NAME"_patched.json
+
+ aws ecs register-task-definition --cli-input-json file:///Users/jmckenzie/devops/ECS/"$TASK_NAME"_patched.json 1>/dev/null
