@@ -1,7 +1,12 @@
-# ecs_fargate
+# Step 1: Get list of ECS Task definitions
 
-Quick Demo notes
+aws ecs list-task-definitions
 
-To removed all managed sections of an ECS tasl before registration:
+# Step 2: Download Task definition
 
-jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .registeredAt, .registeredBy, .compatibilities, .networkMode, .cpu, .memory)' task_definition.json > cleaned_task_definition.json
+aws ecs describe-task-definition --task-definition <task-definition-arn> --out json > task_definition.json
+
+
+# Step 3: Clean up Task definition
+
+jq '.taskDefinition | walk(if type == "object" then del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .registeredAt, .registeredBy, .compatibilities) else . end)' task_definition.json > cleaned_vulnapp_definition.json
