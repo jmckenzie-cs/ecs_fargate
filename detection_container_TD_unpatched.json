@@ -3,7 +3,7 @@
     "containerDefinitions": [
         {
             "name": "detection-container",
-            "image": "517716713836.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:detection-container_amd64",
+            "image": "###########.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images:detection-container_amd64",
             "cpu": 0,
             "portMappings": [
                 {
@@ -32,8 +32,8 @@
             }
         }
     ],
-    "taskRoleArn": "arn:aws:iam::517716713836:role/ECSTaskExecutionRole",
-    "executionRoleArn": "arn:aws:iam::517716713836:role/ECSTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::###########:role/ECSTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::###########:role/ECSTaskExecutionRole",
     "networkMode": "awsvpc",
     "requiresCompatibilities": [
         "FARGATE"
