@@ -1,4 +1,4 @@
-# How to retrieve a existing task definitionn and preform clean up 
+# How to retrieve a existing task definitionn and perform clean up 
 
 ## Step 1: Get list of ECS Task definitions
 This command retrieves all ECS task definitions in your AWS account
