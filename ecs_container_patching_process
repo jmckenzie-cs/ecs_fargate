@@ -29,7 +29,7 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
 
-# Container image to be patched locatoin
+# Container image to be patched location
 export SOURCE_IMAGE_URI=quay.io/crowdstrike/vulnapp:latest
 
 # Container image after patching
