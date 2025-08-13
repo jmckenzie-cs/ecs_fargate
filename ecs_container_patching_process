@@ -1,6 +1,6 @@
 ECS Container patching
 
-Offical Documentation link
+# Offical Documentation link
 
 - https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
 
@@ -19,7 +19,7 @@ export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-
 export PRIVATE_REPO=###########.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
 
 # Get the latest sensor image version and tag it for pushing to the private ECR.
-export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
+export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container --platform aarch64| tail -1) && echo $LATESTSENSOR
 docker tag $LATESTSENSOR "$PRIVATE_REPO":falcon-container-sensor-latest
 
 # Log in to the private ECR repository using AWS CLI.
@@ -33,20 +33,19 @@ docker push $FALCON_IMAGE_URI
 export SOURCE_IMAGE_URI=quay.io/crowdstrike/vulnapp:latest
 
 # Container image after patching
-export TARGET_IMAGE_URI="$PRIVATE_REPO"/vulnapp:latest-patched
+export TARGET_IMAGE_URI="$PRIVATE_REPO":vulnapp-latest-patched
 
 
 # The Falcon utility, falconutil, is packaged within the Falcon Container sensor image. Run this utility locally to patch your application container image with the Falcon Container sensor for Linux. You can also run this as part of your CI/CD process.
 
 # 1. docker run: This is the command used to create and start a container from a Docker image.
-# 2. --platform linux/amd64: This option specifies the platform on which to run the container. In this case, it forces the container to run on the linux/amd64 architecture. This is useful if you are running the command on a machine with a different architecture (such as arm64) and want to run an image built for amd64.
-# 3. --user 0:0: This sets the user and group ID under which the container will run. 0:0 means the container will run as the root user and root group inside the container. By default, many containers do not run as root for security reasons, but this option forces it to do so.
-# 4. -v ${HOME}/.docker/config.json:/root/.docker/config.json: The -v flag is used to mount a volume from the host machine to the container. In this case:
-# 5. ${HOME}/.docker/config.json refers to the Docker configuration file on the host system (this is a path in the user's home directory).
-# 6. /root/.docker/config.json is the location inside the container where the file will be mounted. This allows the container to use the same Docker credentials as the host, which is useful when pulling or pushing Docker images to a registry.
-# 7. -v /var/run/docker.sock:/var/run/docker.sock: This mounts the Docker socket from the host to the container. The Docker socket (/var/run/docker.sock) allows the container to communicate with the Docker daemon running on the host. This is typically used in scenarios where the container needs to manage Docker containers or images on the host system.
+# 2. --user 0:0: This sets the user and group ID under which the container will run. 0:0 means the container will run as the root user and root group inside the container. By default, many containers do not run as root for security reasons, but this option forces it to do so.
+# 3. -v ${HOME}/.docker/config.json:/root/.docker/config.json: The -v flag is used to mount a volume from the host machine to the container. In this case:
+# 4. ${HOME}/.docker/config.json refers to the Docker configuration file on the host system (this is a path in the user's home directory).
+# 5. /root/.docker/config.json is the location inside the container where the file will be mounted. This allows the container to use the same Docker credentials as the host, which is useful when pulling or pushing Docker images to a registry.
+# 6. -v /var/run/docker.sock:/var/run/docker.sock: This mounts the Docker socket from the host to the container. The Docker socket (/var/run/docker.sock) allows the container to communicate with the Docker daemon running on the host. This is typically used in scenarios where the container needs to manage Docker containers or images on the host system.
 
-docker run --platform linux/amd64 --user 0:0 \
+docker run --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --rm "$FALCON_IMAGE_URI" \
@@ -55,7 +54,13 @@ docker run --platform linux/amd64 --user 0:0 \
   --target-image-uri $TARGET_IMAGE_URI \
   --falcon-image-uri $FALCON_IMAGE_URI \
   --cid $FALCON_CID \
-  --image-pull-policy IfNotPresent
+  --image-pull-policy IfNotPresent \
+  --cloud-service ECS_FARGATE
+
+# Pushed Patched image to private repo
+
+docker push $TARGET_IMAGE_URI
+
 
 
 
@@ -73,10 +78,10 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
 docker push $FALCON_IMAGE_URI
 export SOURCE_IMAGE_URI=quay.io/crowdstrike/vulnapp:latest
-export TARGET_IMAGE_URI="$PRIVATE_REPO"/vulnapp:latest-patched
+export TARGET_IMAGE_URI="$PRIVATE_REPO":vulnapp-latest-patched
 
 
-docker run --platform linux/amd64 --user 0:0 \
+docker run --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --rm "$FALCON_IMAGE_URI" \
@@ -86,5 +91,6 @@ docker run --platform linux/amd64 --user 0:0 \
   --falcon-image-uri $FALCON_IMAGE_URI \
   --cid $FALCON_CID \
   --image-pull-policy IfNotPresent
+  --cloud-service ECS_FARGATE
 
-
+ docker push $TARGET_IMAGE_URI
