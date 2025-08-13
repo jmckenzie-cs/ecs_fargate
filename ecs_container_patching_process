@@ -50,7 +50,7 @@ docker run --platform linux/amd64 --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --rm "$FALCON_IMAGE_URI" \
-  falconutil patch-image ecsfargate \
+  falconutil patch-image patch-image \
   --source-image-uri $SOURCE_IMAGE_URI \
   --target-image-uri $TARGET_IMAGE_URI \
   --falcon-image-uri $FALCON_IMAGE_URI \
@@ -80,7 +80,7 @@ docker run --platform linux/amd64 --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --rm "$FALCON_IMAGE_URI" \
-  falconutil patch-image ecsfargate \
+  falconutil patch-image patch-image \
   --source-image-uri $SOURCE_IMAGE_URI \
   --target-image-uri $TARGET_IMAGE_URI \
   --falcon-image-uri $FALCON_IMAGE_URI \
