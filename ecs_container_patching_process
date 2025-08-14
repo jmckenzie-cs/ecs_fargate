@@ -1,8 +1,10 @@
 ECS Container patching
 
-# Offical Documentation link
+Offical Documentation link
 
-- https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
+us-1 - https://falcon.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
+us-2 - https://falcon.us-2.crowdstrike.com/documentation/page/a5c297cc/deploy-falcon-container-sensor-for-linux-on-ecs-fargate#s2a77e24
+
 
 # Download the script for pulling the Falcon container sensor.
 curl -sSL -o falcon-container-sensor-pull.sh "https://github.com/CrowdStrike/falcon-scripts/releases/latest/download/falcon-container-sensor-pull.sh"
@@ -19,7 +21,7 @@ export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-
 export PRIVATE_REPO=###########.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
 
 # Get the latest sensor image version and tag it for pushing to the private ECR.
-export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container --platform aarch64| tail -1) && echo $LATESTSENSOR
+export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container --platform x86_64 | tail -1) && echo $LATESTSENSOR
 docker tag $LATESTSENSOR "$PRIVATE_REPO":falcon-container-sensor-latest
 
 # Log in to the private ECR repository using AWS CLI.
@@ -49,7 +51,7 @@ docker run --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --rm "$FALCON_IMAGE_URI" \
-  falconutil patch-image patch-image \
+  falconutil patch-image \
   --source-image-uri $SOURCE_IMAGE_URI \
   --target-image-uri $TARGET_IMAGE_URI \
   --falcon-image-uri $FALCON_IMAGE_URI \
@@ -72,7 +74,7 @@ export FALCON_CLIENT_ID=7bdb56cba5204f62a6e4d########
 export FALCON_CLIENT_SECRET=8HENWYdIOon912pKJRkZ6i4CXr5########
 export FALCON_CID=$(./falcon-container-sensor-pull.sh -t falcon-container --get-cid)
 export PRIVATE_REPO=###########.dkr.ecr.us-east-1.amazonaws.com/mckenzie-images
-export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container | tail -1) && echo $LATESTSENSOR
+export LATESTSENSOR=$(./falcon-container-sensor-pull.sh -t falcon-container --platform x86_64 | tail -1) && echo $LATESTSENSOR
 docker tag $LATESTSENSOR "$PRIVATE_REPO":falcon-container-sensor-latest
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$PRIVATE_REPO"
 export FALCON_IMAGE_URI="$PRIVATE_REPO":falcon-container-sensor-latest
@@ -85,12 +87,16 @@ docker run --user 0:0 \
   -v ${HOME}/.docker/config.json:/root/.docker/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --rm "$FALCON_IMAGE_URI" \
-  falconutil patch-image patch-image \
+  falconutil patch-image \
   --source-image-uri $SOURCE_IMAGE_URI \
   --target-image-uri $TARGET_IMAGE_URI \
   --falcon-image-uri $FALCON_IMAGE_URI \
   --cid $FALCON_CID \
-  --image-pull-policy IfNotPresent
+  --image-pull-policy IfNotPresent \
   --cloud-service ECS_FARGATE
 
  docker push $TARGET_IMAGE_URI
+
+
+
+
